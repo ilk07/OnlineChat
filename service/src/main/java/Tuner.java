@@ -11,6 +11,9 @@ public abstract class Tuner {
     protected static String exitCommand;
     protected static String logFilePathName;
 
+    private static final Logger log = Logger.getInstance();
+
+
     public Tuner() {
 
         FileInputStream fis;
@@ -21,6 +24,7 @@ public abstract class Tuner {
             property.load(fis);
 
             logFilePathName = property.getProperty("logFilePathName");
+            log.setLogFileName(logFilePathName);
 
             port = Integer.parseInt(property.getProperty("port"));
 

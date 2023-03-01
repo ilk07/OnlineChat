@@ -7,7 +7,7 @@ public class Logger {
     private static Logger INSTANCE = null;
     DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
-    //private static Logger logger;
+//    private static Logger logger;
 
     private Logger() {
     }
