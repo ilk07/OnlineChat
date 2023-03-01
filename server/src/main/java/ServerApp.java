@@ -5,13 +5,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ServerApp extends Tuner{
+public class ServerApp extends Tuner {
     private static final String serverName = "Server";
 
     public static final Map<String, Communicator> userConnections = new ConcurrentHashMap<>();
     public static final BlockingQueue<Message> messages = new ArrayBlockingQueue<>(100);
     private static final Logger log = Logger.getInstance();
-
 
     public ServerApp() {
         super();
@@ -26,56 +25,62 @@ public class ServerApp extends Tuner{
         try (ServerSocket server = new ServerSocket(port)) {
 
             log.log(serverName, "server started!");
-
-            //создаем поток для отправки сообщений в чат
-            new Thread(() -> {
-                log.log(serverName, "the thread of sending messages to the chat has started " + Thread.currentThread().getName());
-                while (true) {
-                    try {
-                        //Берём сообщение из очереди
-                        Message message = messages.take();
-
-                        //в цикле идём по активным соединениям и отправляем в соответствии с типом сообщения
-
-                        for (Map.Entry<String, Communicator> entry : userConnections.entrySet()) {
-                            entry.getValue().sendMsg(message);
-                        }
-
-                    } catch (InterruptedException | IOException e) {
-                        return;
-                    }
-                }
-            }).start();
-
-            while (true) {
-
-                //ждем подключения клиента
-                Communicator connection = new Communicator(server);
-                log.log(serverName, "accept new connection" );
-
-                //создаём отдельный поток для клиента
-                new Thread(() -> {
-
-                    //пишем в лог старт потока
-                    log.log(serverName, "started a separate thread for the client " + Thread.currentThread().getName());
-
-                    messenger(connection);
-
-                    try {
-                        connection.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    log.log(serverName, "start interruption in thread " + Thread.currentThread().getName());
-                    Thread.currentThread().interrupt();
-
-                }).start();
-
-            }
+            startMessageSenderThread();
+            startCommunicatorListener(server);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void startCommunicatorListener(ServerSocket server) {
+        while (true) {
+
+            //ждем подключения клиента
+            Communicator connection = new Communicator(server);
+            log.log(serverName, "accept new connection");
+
+            //создаём отдельный поток для клиента
+            new Thread(() -> {
+
+                //пишем в лог старт потока
+                log.log(serverName, "started a separate thread for the client " + Thread.currentThread().getName());
+
+                messenger(connection);
+
+                try {
+                    connection.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                log.log(serverName, "start interruption in thread " + Thread.currentThread().getName());
+                Thread.currentThread().interrupt();
+
+            }).start();
+
+        }
+    }
+
+    private static void startMessageSenderThread() {
+        //создаем поток для отправки сообщений в чат
+        new Thread(() -> {
+            log.log(serverName, "the thread of sending messages to the chat has started " + Thread.currentThread().getName());
+            while (true) {
+                try {
+                    //Берём сообщение из очереди
+                    Message message = messages.take();
+
+                    //в цикле идём по активным соединениям и отправляем в соответствии с типом сообщения
+
+                    for (Map.Entry<String, Communicator> entry : userConnections.entrySet()) {
+                        entry.getValue().sendMsgFromQueue(message);
+                    }
+
+                } catch (InterruptedException | IOException e) {
+                    return;
+                }
+            }
+        }).start();
     }
 
     private static void messenger(Communicator connection) {
@@ -93,7 +98,7 @@ public class ServerApp extends Tuner{
                         log.log(responseMsg.getSender(), "try to exit from chat");
                         userConnections.remove(responseMsg.getSender());
                         //messages.put(new Message(serverName, "User " + responseMsg.getSender() + "leave chat", MessageType.SYSTEM_MESSAGE));
-                    } else{
+                    } else {
                         log.log("user", "try to exit from chat");
                     }
 

@@ -1,15 +1,12 @@
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-public class ClientAppTest{
+public class ClientAppTest {
     @Mock
-    Tuner tuner;
-
     ClientApp sut;
 
     @BeforeEach
@@ -23,31 +20,28 @@ public class ClientAppTest{
     }
 
     @BeforeAll
-    public static void startAllTests(){
+    public static void startAllTests() {
         System.out.println("---START ClientAppTest ---");
     }
+
     @AfterAll
-    public static void endAllTests(){
+    public static void endAllTests() {
         System.out.println("---ClientAppTest COMPLETED---");
     }
 
     @Test
     @DisplayName("ClientAppTest is Instance of ClientApp Object")
-    public void clientAppIsInstanceOfClientAppTest(){
+    public void clientAppIsInstanceOfClientAppTest() {
         assertInstanceOf(ClientApp.class, sut);
     }
 
     @Test
     @DisplayName("Set ClientApp username")
-    public void setClientAppUserNameTest(){
+    public void setClientAppUserNameTest() {
         sut.setUsername("newUserName");
         String expected = "newUserName";
         String actual = sut.getUsername();
 
         assertEquals(expected, actual);
     }
-
-
-
-
 }

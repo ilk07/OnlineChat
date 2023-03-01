@@ -41,6 +41,10 @@ public class Communicator implements Closeable {
         log.logMsg(msg);
     }
 
+    public void sendMsgFromQueue(Message msg) throws IOException {
+        outputStream.writeObject(msg);
+    }
+
     public void printMsg(String message) {
         System.out.println(message);
     }

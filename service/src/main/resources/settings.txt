@@ -2,4 +2,5 @@ host = 127.0.0.1
 port = 8080
 exitCommand = /exit
 logFilePathName = file.log
-help = google.com
+help = https://google.com
+git = https://github.com/ilk07/OnlineChat
