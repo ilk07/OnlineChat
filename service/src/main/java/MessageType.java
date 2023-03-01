@@ -1,0 +1,10 @@
+public enum MessageType {
+    REQUEST_USER_NAME,
+    ACCEPT_USER_NAME,
+    USER_NAME,
+    NAME_USED,
+    EXIT_CHAT,
+    USER_TEXT_MESSAGE,
+    SYSTEM_MESSAGE
+}
+
